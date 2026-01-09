@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELITE - 動態導航中心</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --card: #1c222b;
+            --border: #30363d;
+            --blue: #00d2ff;
+            --gold: #ffa502;
+            --red: #ff4757;
+            --text: #c9d1d9;
+        }
+
+        body {
+            font-family: -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 25px;
+        }
+
+        h2 { color: var(--blue); margin: 0; }
+
+        .admin-unlock {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--border);
+            padding: 5px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* 新增按鈕的面板 */
+        #admin-panel {
+            background: var(--card);
+            border: 1px solid var(--gold);
+            padding: 20px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 20px;
+            display: none; /* 預設隱藏 */
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            background: #000;
+            border: 1px solid var(--border);
+            color: #fff;
+            border-radius: 8px;
+            min-width: 150px;
+        }
+
+        .add-btn {
+            background: var(--gold);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* 導航網格 */
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .nav-item {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 20px 10px;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            transition: 0.2s;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            border-color: var(--blue);
+            transform: translateY(-3px);
+        }
+
+        /* 刪除按鈕 */
+        .del-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: var(--red);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            display: none; /* 預設隱藏，管理模式才開啟 */
+        }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2>🌐 導航中心</h2>
+        <button class="admin-unlock" onclick="unlockAdmin()">⚙️ 管理員模式</button>
+    </div>
+
+    <div id="admin-panel">
+        <div style="margin-bottom: 10px; font-weight: bold; color: var(--gold);">新增快捷連結</div>
+        <div class="input-group">
+            <input type="text" id="link-name" placeholder="名稱 (例如: 計分系統)">
+            <input type="text" id="link-url" placeholder="網址 (https://...)">
+            <button class="add-btn" onclick="addLink()">確認新增</button>
+        </div>
+        <button onclick="lockAdmin()" style="margin-top: 15px; background: none; border: 1px solid var(--red); color: var(--red); padding: 5px 10px; border-radius: 5px; cursor: pointer;">結束管理並鎖定</button>
+    </div>
+
+    <div class="nav-grid" id="nav-grid">
+        </div>
+
+    <script>
+        let links = JSON.parse(localStorage.getItem('elite_nav_links')) || [
+            { name: 'Supabase', url: 'https://supabase.com' },
+            { name: 'Google', url: 'https://google.com' }
+        ];
+
+        let isAdmin = false;
+
+        function renderLinks() {
+            const grid = document.getElementById('nav-grid');
+            grid.innerHTML = links.map((link, index) => `
+                <div class="nav-item">
+                    <a href="${link.url}" target="_blank" style="color:white; text-decoration:none; display:block; width:100%; height:100%;">
+                        <div style="font-size: 24px; margin-bottom: 8px;">🔗</div>
+                        <div>${link.name}</div>
+                    </a>
+                    <button class="del-btn" id="del-${index}" onclick="removeLink(${index})">×</button>
+                </div>
+            `).join('');
+
+            // 如果是管理模式，顯示刪除按鈕
+            if (isAdmin) {
+                document.querySelectorAll('.del-btn').forEach(btn => btn.style.display = 'block');
+            }
+        }
+
+        function unlockAdmin() {
+            const pass = prompt("請輸入管理密碼:");
+            if (pass === "8888") {
+                isAdmin = true;
+                document.getElementById('admin-panel').style.display = 'block';
+                renderLinks();
+            } else {
+                alert("密碼錯誤！");
+            }
+        }
+
+        function lockAdmin() {
+            isAdmin = false;
+            document.getElementById('admin-panel').style.display = 'none';
+            renderLinks();
+        }
+
+        function addLink() {
+            const name = document.getElementById('link-name').value;
+            const url = document.getElementById('link-url').value;
+
+            if (!name || !url) return alert("請輸入完整名稱與網址");
+
+            links.push({ name, url });
+            saveAndRender();
+            
+            // 清空輸入框
+            document.getElementById('link-name').value = '';
+            document.getElementById('link-url').value = '';
+        }
+
+        function removeLink(index) {
+            if (confirm("確定要刪除這個連結嗎？")) {
+                links.splice(index, 1);
+                saveAndRender();
+            }
+        }
+
+        function saveAndRender() {
+            localStorage.setItem('elite_nav_links', JSON.stringify(links));
+            renderLinks();
+        }
+
+        // 初始化
+        renderLinks();
+    </script>
+</body>
+</html>
