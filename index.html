@@ -2,225 +2,168 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELITE - 動態導航中心</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ELITE - 雲端導覽中心</title>
     <style>
-        :root {
-            --bg: #0d1117;
-            --card: #1c222b;
-            --border: #30363d;
-            --blue: #00d2ff;
-            --gold: #ffa502;
-            --red: #ff4757;
-            --text: #c9d1d9;
+        :root { --blue: #00d2ff; --gold: #ffa502; --red: #ff4757; --bg: #0d1117; --card: #1c222b; --border: #30363d; --gray: #8b949e; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 20px; }
+        
+        .container { max-width: 600px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 25px; }
+        .header h1 { color: var(--blue); margin: 0; font-size: 28px; letter-spacing: 2px; }
+        .header p { color: var(--gray); font-size: 13px; margin-top: 5px; }
+
+        /* 模式切換按鈕 */
+        .mode-toggle { text-align: right; margin-bottom: 15px; }
+        .edit-btn { background: none; border: 1px solid var(--gray); color: var(--gray); padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; }
+        .edit-btn.active { border-color: var(--gold); color: var(--gold); }
+
+        /* 連結列表 */
+        .nav-grid { display: grid; gap: 12px; }
+        .nav-item { 
+            background: linear-gradient(145deg, #1c222b, #161b22); border: 1px solid var(--border); border-radius: 16px; 
+            padding: 18px; text-decoration: none; color: #fff; display: flex; 
+            justify-content: space-between; align-items: center; transition: 0.2s; position: relative;
         }
+        .nav-item:active { transform: scale(0.97); }
+        .nav-info { flex-grow: 1; }
+        .nav-title { font-size: 18px; font-weight: 700; color: #fff; }
+        .nav-url { font-size: 11px; color: var(--gray); margin-top: 4px; font-family: monospace; }
 
-        body {
-            font-family: -apple-system, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        /* 管理功能區 */
+        .admin-controls { display: none; gap: 8px; align-items: center; }
+        .admin-mode .admin-controls { display: flex; }
+        .admin-mode .arrow-btn { background: none; border: 1px solid #444; color: #fff; padding: 4px 8px; border-radius: 6px; }
+        .delete-btn { color: var(--red); border: 1px solid var(--red); background: none; padding: 4px 8px; border-radius: 6px; font-size: 12px; }
+
+        /* 新增表單 */
+        #add-form { 
+            background: #161b22; border: 1px dashed var(--gold); border-radius: 16px; 
+            padding: 15px; margin-bottom: 20px; display: none;
         }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            max-width: 800px;
-            margin-bottom: 25px;
+        .admin-mode #add-form { display: block; }
+        input { 
+            width: 100%; background: #000; border: 1px solid var(--border); color: #fff; 
+            padding: 12px; border-radius: 10px; margin-bottom: 10px; box-sizing: border-box; font-size: 14px;
         }
-
-        h2 { color: var(--blue); margin: 0; }
-
-        .admin-unlock {
-            background: none;
-            border: 1px solid var(--border);
-            color: var(--border);
-            padding: 5px 10px;
-            border-radius: 8px;
-            cursor: pointer;
+        .submit-btn { 
+            width: 100%; background: var(--gold); border: none; padding: 12px; 
+            border-radius: 10px; font-weight: bold; color: #000; cursor: pointer;
         }
-
-        /* 新增按鈕的面板 */
-        #admin-panel {
-            background: var(--card);
-            border: 1px solid var(--gold);
-            padding: 20px;
-            border-radius: 15px;
-            width: 100%;
-            max-width: 800px;
-            margin-bottom: 20px;
-            display: none; /* 預設隱藏 */
-        }
-
-        .input-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        input {
-            flex: 1;
-            padding: 12px;
-            background: #000;
-            border: 1px solid var(--border);
-            color: #fff;
-            border-radius: 8px;
-            min-width: 150px;
-        }
-
-        .add-btn {
-            background: var(--gold);
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* 導航網格 */
-        .nav-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 15px;
-            width: 100%;
-            max-width: 800px;
-        }
-
-        .nav-item {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 15px;
-            padding: 20px 10px;
-            text-align: center;
-            text-decoration: none;
-            color: white;
-            font-weight: bold;
-            transition: 0.2s;
-            position: relative;
-        }
-
-        .nav-item:hover {
-            border-color: var(--blue);
-            transform: translateY(-3px);
-        }
-
-        /* 刪除按鈕 */
-        .del-btn {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: var(--red);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            font-size: 12px;
-            cursor: pointer;
-            display: none; /* 預設隱藏，管理模式才開啟 */
-        }
-
-        .hidden { display: none; }
+        
+        .loading-spinner { text-align: center; color: var(--gray); padding: 40px; }
     </style>
 </head>
 <body>
 
+<div class="container">
     <div class="header">
-        <h2>🌐 導航中心</h2>
-        <button class="admin-unlock" onclick="unlockAdmin()">⚙️ 管理員模式</button>
+        <h1>ELITE HUB</h1>
+        <p>所有裝置同步導覽中心</p>
     </div>
 
-    <div id="admin-panel">
-        <div style="margin-bottom: 10px; font-weight: bold; color: var(--gold);">新增快捷連結</div>
-        <div class="input-group">
-            <input type="text" id="link-name" placeholder="名稱 (例如: 計分系統)">
-            <input type="text" id="link-url" placeholder="網址 (https://...)">
-            <button class="add-btn" onclick="addLink()">確認新增</button>
-        </div>
-        <button onclick="lockAdmin()" style="margin-top: 15px; background: none; border: 1px solid var(--red); color: var(--red); padding: 5px 10px; border-radius: 5px; cursor: pointer;">結束管理並鎖定</button>
+    <div class="mode-toggle">
+        <button id="toggle-mode" class="edit-btn" onclick="toggleAdminMode()">⚙️ 管理模式</button>
     </div>
 
-    <div class="nav-grid" id="nav-grid">
-        </div>
+    <div id="add-form">
+        <input type="text" id="new-title" placeholder="站點名稱 (如: 戰場計算)">
+        <input type="text" id="new-url" placeholder="網址 (https://...)">
+        <button class="submit-btn" onclick="addNewLink()">➕ 發佈至雲端清單</button>
+    </div>
 
-    <script>
-        let links = JSON.parse(localStorage.getItem('elite_nav_links')) || [
-            { name: 'Supabase', url: 'https://supabase.com' },
-            { name: 'Google', url: 'https://google.com' }
-        ];
+    <div id="nav-list" class="nav-grid">
+        <div class="loading-spinner">📡 正在同步雲端數據...</div>
+    </div>
+</div>
 
-        let isAdmin = false;
+<script>
+    // --- Supabase 配置 ---
+    const API_URL = 'https://nzuxyiefpenwuqudajdw.supabase.co/rest/v1';
+    const KEY = 'sb_publishable_7y2n8zIopxlKEhcsJ05D2A_U89IFgae';
+    const HEADERS = { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
 
-        function renderLinks() {
-            const grid = document.getElementById('nav-grid');
-            grid.innerHTML = links.map((link, index) => `
-                <div class="nav-item">
-                    <a href="${link.url}" target="_blank" style="color:white; text-decoration:none; display:block; width:100%; height:100%;">
-                        <div style="font-size: 24px; margin-bottom: 8px;">🔗</div>
-                        <div>${link.name}</div>
-                    </a>
-                    <button class="del-btn" id="del-${index}" onclick="removeLink(${index})">×</button>
+    let isAdmin = false;
+
+    // 1. 初始化抓取 (按 sort_order 排序)
+    async function fetchLinks() {
+        const res = await fetch(`${API_URL}/nav_links?select=*&order=sort_order.asc`, { headers: HEADERS });
+        const data = await res.json();
+        render(data);
+    }
+
+    // 2. 渲染 UI
+    function render(links) {
+        const list = document.getElementById('nav-list');
+        list.className = isAdmin ? 'nav-grid admin-mode' : 'nav-grid';
+        
+        if (links.length === 0) {
+            list.innerHTML = '<div style="text-align:center; color:#555; padding:20px;">目前沒有連結</div>';
+            return;
+        }
+
+        list.innerHTML = links.map(link => `
+            <div class="nav-item">
+                <a href="${link.url}" target="_blank" class="nav-info" style="text-decoration:none;">
+                    <div class="nav-title">${link.title}</div>
+                    <div class="nav-url">${link.url}</div>
+                </a>
+                <div class="admin-controls">
+                    <button class="arrow-btn" onclick="reorder(${link.id}, ${link.sort_order}, -1)">▲</button>
+                    <button class="arrow-btn" onclick="reorder(${link.id}, ${link.sort_order}, 1)">▼</button>
+                    <button class="delete-btn" onclick="deleteLink(${link.id})">刪除</button>
                 </div>
-            `).join('');
+            </div>
+        `).join('');
+    }
 
-            // 如果是管理模式，顯示刪除按鈕
-            if (isAdmin) {
-                document.querySelectorAll('.del-btn').forEach(btn => btn.style.display = 'block');
-            }
-        }
+    // 3. 切換管理模式
+    function toggleAdminMode() {
+        isAdmin = !isAdmin;
+        document.getElementById('toggle-mode').classList.toggle('active', isAdmin);
+        fetchLinks();
+    }
 
-        function unlockAdmin() {
-            const pass = prompt("請輸入管理密碼:");
-            if (pass === "8888") {
-                isAdmin = true;
-                document.getElementById('admin-panel').style.display = 'block';
-                renderLinks();
-            } else {
-                alert("密碼錯誤！");
-            }
-        }
+    // 4. 新增連結 (自動設 sort_order 為當前最大值+1)
+    async function addNewLink() {
+        const title = document.getElementById('new-title').value;
+        const url = document.getElementById('new-url').value;
+        if (!title || !url) return;
 
-        function lockAdmin() {
-            isAdmin = false;
-            document.getElementById('admin-panel').style.display = 'none';
-            renderLinks();
-        }
+        // 簡單權重：取當前時間戳
+        const order = Date.now() % 1000000;
 
-        function addLink() {
-            const name = document.getElementById('link-name').value;
-            const url = document.getElementById('link-url').value;
+        await fetch(`${API_URL}/nav_links`, {
+            method: 'POST',
+            headers: HEADERS,
+            body: JSON.stringify({ title, url, sort_order: order })
+        });
+        
+        document.getElementById('new-title').value = '';
+        document.getElementById('new-url').value = '';
+        fetchLinks();
+    }
 
-            if (!name || !url) return alert("請輸入完整名稱與網址");
+    // 5. 刪除連結
+    async function deleteLink(id) {
+        if (!confirm("確定要刪除這個連結嗎？")) return;
+        await fetch(`${API_URL}/nav_links?id=eq.${id}`, { method: 'DELETE', headers: HEADERS });
+        fetchLinks();
+    }
 
-            links.push({ name, url });
-            saveAndRender();
-            
-            // 清空輸入框
-            document.getElementById('link-name').value = '';
-            document.getElementById('link-url').value = '';
-        }
+    // 6. 排序功能 (簡單邏輯：調整 sort_order)
+    async function reorder(id, currentOrder, direction) {
+        const newOrder = currentOrder + direction;
+        await fetch(`${API_URL}/nav_links?id=eq.${id}`, {
+            method: 'PATCH',
+            headers: HEADERS,
+            body: JSON.stringify({ sort_order: newOrder })
+        });
+        fetchLinks();
+    }
 
-        function removeLink(index) {
-            if (confirm("確定要刪除這個連結嗎？")) {
-                links.splice(index, 1);
-                saveAndRender();
-            }
-        }
-
-        function saveAndRender() {
-            localStorage.setItem('elite_nav_links', JSON.stringify(links));
-            renderLinks();
-        }
-
-        // 初始化
-        renderLinks();
-    </script>
+    fetchLinks();
+</script>
 </body>
 </html>
+
