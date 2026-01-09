@@ -2,167 +2,108 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ELITE - 雲端導覽中心</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELITE 導覽中心</title>
     <style>
-        :root { --blue: #00d2ff; --gold: #ffa502; --red: #ff4757; --bg: #0d1117; --card: #1c222b; --border: #30363d; --gray: #8b949e; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 20px; }
-        
-        .container { max-width: 600px; margin: 0 auto; }
-        .header { text-align: center; margin-bottom: 25px; }
-        .header h1 { color: var(--blue); margin: 0; font-size: 28px; letter-spacing: 2px; }
-        .header p { color: var(--gray); font-size: 13px; margin-top: 5px; }
-
-        /* 模式切換按鈕 */
-        .mode-toggle { text-align: right; margin-bottom: 15px; }
-        .edit-btn { background: none; border: 1px solid var(--gray); color: var(--gray); padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; }
-        .edit-btn.active { border-color: var(--gold); color: var(--gold); }
-
-        /* 連結列表 */
-        .nav-grid { display: grid; gap: 12px; }
+        /* 這裡就是 CSS (油漆區) */
+        body { background: #0d1117; color: white; font-family: sans-serif; padding: 20px; }
         .nav-item { 
-            background: linear-gradient(145deg, #1c222b, #161b22); border: 1px solid var(--border); border-radius: 16px; 
-            padding: 18px; text-decoration: none; color: #fff; display: flex; 
-            justify-content: space-between; align-items: center; transition: 0.2s; position: relative;
+            background: #1c222b; border: 1px solid #30363d; 
+            padding: 15px; margin-bottom: 10px; border-radius: 12px;
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .nav-item:active { transform: scale(0.97); }
-        .nav-info { flex-grow: 1; }
-        .nav-title { font-size: 18px; font-weight: 700; color: #fff; }
-        .nav-url { font-size: 11px; color: var(--gray); margin-top: 4px; font-family: monospace; }
-
-        /* 管理功能區 */
-        .admin-controls { display: none; gap: 8px; align-items: center; }
-        .admin-mode .admin-controls { display: flex; }
-        .admin-mode .arrow-btn { background: none; border: 1px solid #444; color: #fff; padding: 4px 8px; border-radius: 6px; }
-        .delete-btn { color: var(--red); border: 1px solid var(--red); background: none; padding: 4px 8px; border-radius: 6px; font-size: 12px; }
-
-        /* 新增表單 */
-        #add-form { 
-            background: #161b22; border: 1px dashed var(--gold); border-radius: 16px; 
-            padding: 15px; margin-bottom: 20px; display: none;
-        }
-        .admin-mode #add-form { display: block; }
-        input { 
-            width: 100%; background: #000; border: 1px solid var(--border); color: #fff; 
-            padding: 12px; border-radius: 10px; margin-bottom: 10px; box-sizing: border-box; font-size: 14px;
-        }
-        .submit-btn { 
-            width: 100%; background: var(--gold); border: none; padding: 12px; 
-            border-radius: 10px; font-weight: bold; color: #000; cursor: pointer;
-        }
-        
-        .loading-spinner { text-align: center; color: var(--gray); padding: 40px; }
+        .btn-edit { background: none; border: 1px solid #8b949e; color: #8b949e; padding: 5px 10px; border-radius: 5px; }
+        .btn-active { border-color: #ffa502; color: #ffa502; }
+        .admin-box { background: #161b22; border: 1px dashed #ffa502; padding: 15px; border-radius: 12px; margin-bottom: 20px; }
+        input { width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: 1px solid #333; background: #000; color: #fff; box-sizing: border-box; }
+        .save-btn { width: 100%; padding: 10px; background: #ffa502; border: none; border-radius: 5px; font-weight: bold; }
+        .del-btn { color: #ff4757; border: 1px solid #ff4757; background: none; padding: 3px 8px; border-radius: 5px; margin-left: 10px; }
+        a { color: #00d2ff; text-decoration: none; font-size: 18px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h1>ELITE HUB</h1>
-        <p>所有裝置同步導覽中心</p>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2 style="color:#00d2ff; margin:0;">ELITE 導覽</h2>
+        <button id="toggle-btn" class="btn-edit" onclick="toggleAdmin()">⚙️ 管理模式</button>
     </div>
 
-    <div class="mode-toggle">
-        <button id="toggle-mode" class="edit-btn" onclick="toggleAdminMode()">⚙️ 管理模式</button>
+    <div id="add-form" class="admin-box" style="display: none;">
+        <input type="text" id="in-title" placeholder="網站名稱">
+        <input type="text" id="in-url" placeholder="網址 (https://...)">
+        <button class="save-btn" onclick="addNew()">確認新增</button>
     </div>
 
-    <div id="add-form">
-        <input type="text" id="new-title" placeholder="站點名稱 (如: 戰場計算)">
-        <input type="text" id="new-url" placeholder="網址 (https://...)">
-        <button class="submit-btn" onclick="addNewLink()">➕ 發佈至雲端清單</button>
+    <div id="nav-list">
+        正在同步雲端資料...
     </div>
-
-    <div id="nav-list" class="nav-grid">
-        <div class="loading-spinner">📡 正在同步雲端數據...</div>
-    </div>
-</div>
 
 <script>
-    // --- Supabase 配置 ---
+    // --- 這裡放你的 Supabase 資料 (這部分是電路) ---
     const API_URL = 'https://nzuxyiefpenwuqudajdw.supabase.co/rest/v1';
-    const KEY = 'sb_publishable_7y2n8zIopxlKEhcsJ05D2A_U89IFgae';
+    const KEY = 'sb_publishable_7y2n8zIopxlKEhcsJ05D2A_U89IFgae'; // 這裡要換成你的 Key
     const HEADERS = { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
 
-    let isAdmin = false;
+    let adminMode = false;
 
-    // 1. 初始化抓取 (按 sort_order 排序)
-    async function fetchLinks() {
-        const res = await fetch(`${API_URL}/nav_links?select=*&order=sort_order.asc`, { headers: HEADERS });
-        const data = await res.json();
-        render(data);
-    }
-
-    // 2. 渲染 UI
-    function render(links) {
-        const list = document.getElementById('nav-list');
-        list.className = isAdmin ? 'nav-grid admin-mode' : 'nav-grid';
+    // 切換管理員模式的機關
+    function toggleAdmin() {
+        adminMode = !adminMode;
+        const btn = document.getElementById('toggle-btn');
+        const form = document.getElementById('add-form');
         
-        if (links.length === 0) {
-            list.innerHTML = '<div style="text-align:center; color:#555; padding:20px;">目前沒有連結</div>';
-            return;
+        if (adminMode) {
+            btn.innerText = "✅ 退出管理";
+            btn.classList.add('btn-active');
+            form.style.display = "block"; // 顯示新增表單
+        } else {
+            btn.innerText = "⚙️ 管理模式";
+            btn.classList.remove('btn-active');
+            form.style.display = "none"; // 隱藏新增表單
         }
+        fetchData(); // 重新整理清單，讓刪除按鈕出現或消失
+    }
 
-        list.innerHTML = links.map(link => `
-            <div class="nav-item">
-                <a href="${link.url}" target="_blank" class="nav-info" style="text-decoration:none;">
-                    <div class="nav-title">${link.title}</div>
-                    <div class="nav-url">${link.url}</div>
-                </a>
-                <div class="admin-controls">
-                    <button class="arrow-btn" onclick="reorder(${link.id}, ${link.sort_order}, -1)">▲</button>
-                    <button class="arrow-btn" onclick="reorder(${link.id}, ${link.sort_order}, 1)">▼</button>
-                    <button class="delete-btn" onclick="deleteLink(${link.id})">刪除</button>
+    async function fetchData() {
+        const res = await fetch(`${API_URL}/nav_links?select=*&order=id.asc`, { headers: HEADERS });
+        const data = await res.json();
+        
+        let html = "";
+        data.forEach(item => {
+            html += `
+                <div class="nav-item">
+                    <a href="${item.url}" target="_blank">${item.title}</a>
+                    <div>
+                        ${adminMode ? `<button class="del-btn" onclick="deleteItem(${item.id})">刪除</button>` : '<span>➜</span>'}
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        });
+        document.getElementById('nav-list').innerHTML = html;
     }
 
-    // 3. 切換管理模式
-    function toggleAdminMode() {
-        isAdmin = !isAdmin;
-        document.getElementById('toggle-mode').classList.toggle('active', isAdmin);
-        fetchLinks();
-    }
-
-    // 4. 新增連結 (自動設 sort_order 為當前最大值+1)
-    async function addNewLink() {
-        const title = document.getElementById('new-title').value;
-        const url = document.getElementById('new-url').value;
-        if (!title || !url) return;
-
-        // 簡單權重：取當前時間戳
-        const order = Date.now() % 1000000;
-
+    async function addNew() {
+        const t = document.getElementById('in-title').value;
+        const u = document.getElementById('in-url').value;
+        if(!t || !u) return alert("請輸入名稱和網址");
+        
         await fetch(`${API_URL}/nav_links`, {
             method: 'POST',
             headers: HEADERS,
-            body: JSON.stringify({ title, url, sort_order: order })
+            body: JSON.stringify({ title: t, url: u })
         });
-        
-        document.getElementById('new-title').value = '';
-        document.getElementById('new-url').value = '';
-        fetchLinks();
+        document.getElementById('in-title').value = "";
+        document.getElementById('in-url').value = "";
+        fetchData();
     }
 
-    // 5. 刪除連結
-    async function deleteLink(id) {
-        if (!confirm("確定要刪除這個連結嗎？")) return;
+    async function deleteItem(id) {
+        if(!confirm("確定刪除？")) return;
         await fetch(`${API_URL}/nav_links?id=eq.${id}`, { method: 'DELETE', headers: HEADERS });
-        fetchLinks();
+        fetchData();
     }
 
-    // 6. 排序功能 (簡單邏輯：調整 sort_order)
-    async function reorder(id, currentOrder, direction) {
-        const newOrder = currentOrder + direction;
-        await fetch(`${API_URL}/nav_links?id=eq.${id}`, {
-            method: 'PATCH',
-            headers: HEADERS,
-            body: JSON.stringify({ sort_order: newOrder })
-        });
-        fetchLinks();
-    }
-
-    fetchLinks();
+    fetchData(); // 網頁打開時先抓一次資料
 </script>
 </body>
 </html>
