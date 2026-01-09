@@ -3,52 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELITE 導覽中心 - 終極版</title>
+    <title>ELITE HUB</title>
     <style>
-        :root { --blue: #00d2ff; --gold: #ffa502; --bg: #0d1117; --card: #1c222b; --border: #30363d; }
-        body { background: var(--bg); color: white; font-family: sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        :root { --blue: #00d2ff; --gold: #ffa502; --bg: #0d1117; --card: #1c222b; --border: #30363d; --gray: #8b949e; }
+        body { background: var(--bg); color: white; font-family: -apple-system, system-ui, sans-serif; padding: 20px; max-width: 500px; margin: 0 auto; }
+        
+        /* 頂部 */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .header h2 { letter-spacing: 1px; font-weight: 800; color: var(--blue); margin: 0; }
+
+        /* 列表樣式 */
         .nav-item { 
             background: var(--card); border: 1px solid var(--border); 
-            padding: 15px; margin-bottom: 12px; border-radius: 16px;
-            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 16px; margin-bottom: 12px; border-radius: 18px;
+            display: flex; align-items: center; transition: 0.2s; cursor: pointer;
         }
-        .icon-circle { width: 40px; height: 40px; background: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 20px; }
-        .info { flex-grow: 1; }
-        a { color: white; text-decoration: none; font-size: 18px; font-weight: bold; display: block; }
-        .url-text { color: #8b949e; font-size: 12px; font-family: monospace; }
+        .nav-item:active { transform: scale(0.97); background: #252d38; }
+
+        /* 固定大小圖示 UI */
+        .icon-box { 
+            width: 45px; height: 45px; background: rgba(255,255,255,0.05); 
+            border-radius: 12px; display: flex; align-items: center; justify-content: center; 
+            font-size: 22px; margin-right: 15px; flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
         
-        /* 管理區 */
-        .admin-box { background: #161b22; border: 1px dashed var(--gold); padding: 15px; border-radius: 12px; margin-bottom: 20px; }
-        input, select { width: 100%; padding: 10px; margin: 5px 0; border-radius: 8px; border: 1px solid #333; background: #000; color: #fff; box-sizing: border-box; }
-        .btn { padding: 8px 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
-        .btn-gold { background: var(--gold); color: #000; width: 100%; margin-top: 10px; }
-        .btn-edit { background: none; border: 1px solid #8b949e; color: #8b949e; }
-        .btn-active { border-color: var(--gold); color: var(--gold); }
-        .edit-input { background: #111; border: 1px solid var(--gold); color: white; padding: 4px; border-radius: 4px; width: 90%; }
-        .backup-btn { background: #238636; color: white; font-size: 12px; margin-top: 20px; width: 100%; opacity: 0.7; }
+        .title-text { font-size: 17px; font-weight: 600; flex-grow: 1; }
+
+        /* 管理面板 */
+        .admin-box { background: #161b22; border: 1px solid var(--gold); padding: 15px; border-radius: 18px; margin-bottom: 20px; }
+        input, select { width: 100%; padding: 12px; margin: 6px 0; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; box-sizing: border-box; font-size: 14px; }
+        
+        .btn { padding: 8px 16px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-gold { background: var(--gold); color: #000; width: 100%; margin-top: 10px; font-size: 16px; }
+        .btn-edit { background: none; border: 1px solid var(--gray); color: var(--gray); font-size: 12px; }
+        .btn-active { border-color: var(--gold); color: var(--gold); background: rgba(255,165,2,0.1); }
+        
+        /* 修改模式下的輸入框 */
+        .edit-row { width: 100%; display: flex; flex-direction: column; gap: 4px; }
+        .edit-input { background: #000; border: 1px solid #444; color: white; padding: 8px; border-radius: 8px; width: 100%; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2 style="color:var(--blue); margin:0;">ELITE HUB</h2>
+        <h2>ELITE HUB</h2>
         <button id="toggle-btn" class="btn btn-edit" onclick="checkAuth()">⚙️ 管理模式</button>
     </div>
 
     <div id="add-form" class="admin-box" style="display: none;">
-        <h4 style="margin:0 0 10px 0; color:var(--gold);">➕ 新增連結</h4>
-        <select id="in-icon">
-            <option value="🔰">🔰 新手教學</option>
-            <option value="🗃️">🗃️ 資料庫</option>
-            <option value="💻">💻 程式設計</option>
-            <option value="⚙️">⚙️ 後台系統</option>
-            <option value="📊">📊 數據分析</option>
-        </select>
-        <input type="text" id="in-title" placeholder="網站名稱">
+        <div style="display:flex; gap:10px;">
+            <select id="in-icon" style="flex: 1;">
+                <optgroup label="常用">
+                    <option value="🔰">🔰 新手教學</option>
+                    <option value="🗃️">🗃️ 資料中心</option>
+                    <option value="💻">💻 程式開發</option>
+                    <option value="⚙️">⚙️ 後台管理</option>
+                </optgroup>
+                <optgroup label="工具與數據">
+                    <option value="📊">📊 數據分析</option>
+                    <option value="🛠️">🛠️ 工具箱</option>
+                    <option value="💎">💎 錢包/資產</option>
+                    <option value="🚀">🚀 快速啟動</option>
+                </optgroup>
+                <optgroup label="社交與社群">
+                    <option value="💬">💬 社群對話</option>
+                    <option value="📢">📢 公告通知</option>
+                    <option value="🌐">🌐 官方網站</option>
+                    <option value="📁">📁 備份檔案</option>
+                </optgroup>
+            </select>
+            <input type="text" id="in-title" placeholder="名稱" style="flex: 2;">
+        </div>
         <input type="text" id="in-url" placeholder="網址 (https://...)">
-        <button class="btn btn-gold" onclick="addNew()">確認發佈</button>
-        <button class="btn backup-btn" onclick="downloadBackup()">📥 下載現有資料備份檔</button>
+        <button class="btn btn-gold" onclick="addNew()">發佈新連結</button>
     </div>
 
     <div id="nav-list">載入中...</div>
@@ -57,92 +85,77 @@
     const API_URL = 'https://nzuxyiefpenwuqudajdw.supabase.co/rest/v1';
     const KEY = 'sb_publishable_7y2n8zIopxlKEhcsJ05D2A_U89IFgae';
     const HEADERS = { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
-    const ADMIN_PASSWORD = "8888"; // 👈 這裡可以改你的密碼
+    const ADMIN_PASSWORD = "8888"; 
 
     let adminMode = false;
     let currentData = [];
 
-    // 1. 密碼驗證
     function checkAuth() {
         if (!adminMode) {
             let pwd = prompt("請輸入管理密碼：");
-            if (pwd !== ADMIN_PASSWORD) return alert("密碼錯誤！");
+            if (pwd !== ADMIN_PASSWORD) return alert("密碼錯誤");
         }
         toggleAdmin();
     }
 
     function toggleAdmin() {
         adminMode = !adminMode;
-        const btn = document.getElementById('toggle-btn');
-        const form = document.getElementById('add-form');
-        btn.innerText = adminMode ? "✅ 退出管理" : "⚙️ 管理模式";
-        btn.className = adminMode ? "btn btn-edit btn-active" : "btn btn-edit";
-        form.style.display = adminMode ? "block" : "none";
+        document.getElementById('toggle-btn').innerText = adminMode ? "✅ 退出管理" : "⚙️ 管理模式";
+        document.getElementById('toggle-btn').classList.toggle('btn-active', adminMode);
+        document.getElementById('add-form').style.display = adminMode ? "block" : "none";
         render();
     }
 
-    // 2. 抓取資料
     async function fetchData() {
         const res = await fetch(`${API_URL}/nav_links?select=*&order=id.asc`, { headers: HEADERS });
         currentData = await res.json();
         render();
     }
 
-    // 3. 渲染清單 (包含修改模式)
     function render() {
         let html = "";
         currentData.forEach(item => {
-            const icon = item.sort_order && isNaN(item.sort_order) ? item.sort_order : "🔗"; // 借用 sort_order 欄位存圖示
+            const icon = item.icon || "🔗";
             
             if (adminMode) {
+                // 管理模式：顯示編輯框 + 網址 + 刪除
                 html += `
-                    <div class="nav-item" style="border-color:var(--gold);">
-                        <div style="width:100%">
-                            <input class="edit-input" value="${item.title}" onchange="updateItem(${item.id}, 'title', this.value)">
-                            <input class="edit-input" style="font-size:10px; margin-top:5px;" value="${item.url}" onchange="updateItem(${item.id}, 'url', this.value)">
+                    <div class="nav-item" style="border-style: dashed; border-color: var(--gold); cursor: default;">
+                        <div class="edit-row">
+                            <div style="display:flex; gap:5px;">
+                                <input class="edit-input" style="width:50px; text-align:center" value="${icon}" onchange="updateItem(${item.id}, 'icon', this.value)">
+                                <input class="edit-input" value="${item.title}" onchange="updateItem(${item.id}, 'title', this.value)">
+                            </div>
+                            <input class="edit-input" style="font-size:11px; color:var(--gray);" value="${item.url}" onchange="updateItem(${item.id}, 'url', this.value)">
                         </div>
-                        <button style="color:#ff4757; border:none; background:none; font-weight:bold;" onclick="deleteItem(${item.id})">刪除</button>
+                        <button style="color:var(--red); border:none; background:none; font-size:20px; padding-left:10px;" onclick="deleteItem(${item.id})">×</button>
                     </div>`;
             } else {
+                // 檢視模式：極簡 UI
                 html += `
-                    <div class="nav-item">
-                        <div class="icon-circle">${item.icon || '🔗'}</div>
-                        <div class="info">
-                            <a href="${item.url}" target="_blank">${item.title}</a>
-                            <div class="url-text">${item.url}</div>
-                        </div>
-                        <div style="color:#444">➜</div>
+                    <div class="nav-item" onclick="window.open('${item.url}', '_blank')">
+                        <div class="icon-box">${icon}</div>
+                        <div class="title-text">${item.title}</div>
+                        <div style="color:var(--gray); font-size:12px;">➜</div>
                     </div>`;
             }
         });
         document.getElementById('nav-list').innerHTML = html;
     }
 
-    // 4. 新增 (將圖示存入 icon 欄位，如果沒有該欄位請看下方 SQL)
     async function addNew() {
         const t = document.getElementById('in-title').value;
         const u = document.getElementById('in-url').value;
         const i = document.getElementById('in-icon').value;
-        if(!t || !u) return;
-        
-        await fetch(`${API_URL}/nav_links`, {
-            method: 'POST',
-            headers: HEADERS,
-            body: JSON.stringify({ title: t, url: u, icon: i }) // 假設你有 icon 欄位
-        });
+        if(!t || !u) return alert("資料不完整");
+        await fetch(`${API_URL}/nav_links`, { method: 'POST', headers: HEADERS, body: JSON.stringify({ title: t, url: u, icon: i }) });
+        document.getElementById('in-title').value = ""; document.getElementById('in-url').value = "";
         fetchData();
     }
 
-    // 5. 修改功能
     async function updateItem(id, field, value) {
-        let body = {};
-        body[field] = value;
-        await fetch(`${API_URL}/nav_links?id=eq.${id}`, {
-            method: 'PATCH',
-            headers: HEADERS,
-            body: JSON.stringify(body)
-        });
-        console.log("已更新儲存");
+        let body = {}; body[field] = value;
+        await fetch(`${API_URL}/nav_links?id=eq.${id}`, { method: 'PATCH', headers: HEADERS, body: JSON.stringify(body) });
     }
 
     async function deleteItem(id) {
@@ -151,16 +164,8 @@
         fetchData();
     }
 
-    // 6. 備份功能 (匯出 JSON)
-    function downloadBackup() {
-        const blob = new Blob([JSON.stringify(currentData, null, 2)], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `elite_backup_${new Date().toISOString().slice(0,10)}.json`;
-        a.click();
-    }
-
     fetchData();
 </script>
 </body>
 </html>
+
