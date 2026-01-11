@@ -6,147 +6,264 @@
     <title>ELITE HUB - PRO</title>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
-        /* ... 保持你原本的 CSS ... */
         :root { 
             --blue: #00d2ff; --gold: #ffa502; --bg: #0d1117; 
             --card: #1c222b; --border: #30363d; --gray: #8b949e; 
-            --red: #ff4757;
+            --red: #ff4757; --code-font: 'JetBrains Mono', 'Fira Code', monospace;
         }
-        body { background: var(--bg); color: #e6edf3; font-family: -apple-system, system-ui, sans-serif; padding: 15px; max-width: 600px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .header h2 { letter-spacing: 2px; color: var(--blue); margin: 0; }
+        body { 
+            background: var(--bg); color: #e6edf3; 
+            font-family: -apple-system, system-ui, sans-serif; 
+            padding: 15px; max-width: 600px; margin: 0 auto; line-height: 1.5;
+        }
         
-        /* 新增：發送戰報的特別區塊 */
+        /* 頂部 Header */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header h2 { letter-spacing: 2px; font-weight: 900; color: var(--blue); margin: 0; font-size: 24px; }
+
+        /* 戰報子系統區塊 */
         .broadcast-box {
             background: linear-gradient(145deg, #1e2530, #0d1117);
             border: 1px solid var(--gold);
-            padding: 20px;
+            padding: 18px;
             border-radius: 20px;
             margin-bottom: 25px;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(255, 165, 2, 0.15);
+            box-shadow: 0 4px 15px rgba(255, 165, 2, 0.1);
         }
-        .broadcast-box h3 { color: var(--gold); margin: 0 0 10px 0; font-size: 18px; }
-        
-        .btn { padding: 12px 20px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; width: 100%; transition: 0.2s; }
-        .btn-gold { background: var(--gold); color: #000; font-size: 16px; }
-        .btn-gold:active { transform: scale(0.95); opacity: 0.9; }
 
-        /* ... 其餘樣式保持不變 ... */
-        .nav-grid { display: grid; gap: 10px; }
-        .nav-item { background: var(--card); border: 1px solid var(--border); padding: 14px 18px; border-radius: 16px; display: flex; align-items: center; text-decoration: none; color: inherit; margin-bottom: 10px; }
-        .icon-box { width: 42px; height: 42px; background: rgba(255,255,255,0.03); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-right: 15px; border: 1px solid var(--border); }
-        .group-title { font-size: 13px; color: var(--gray); margin: 25px 0 10px 5px; font-weight: bold; text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
+        /* 快速跳轉錨點 */
+        .anchor-nav { 
+            display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; 
+            margin-bottom: 10px; sticky; top: 0; background: var(--bg); z-index: 10;
+            scrollbar-width: none;
+        }
+        .anchor-nav::-webkit-scrollbar { display: none; }
+        .anchor-btn { 
+            background: var(--card); border: 1px solid var(--border); color: var(--gray);
+            padding: 6px 14px; border-radius: 20px; font-size: 12px; white-space: nowrap; cursor: pointer;
+            transition: 0.2s;
+        }
+        .anchor-btn:active { background: var(--blue); color: #000; }
+
+        /* 分類標題樣式 */
+        .group-title { 
+            font-size: 13px; color: var(--gray); margin: 30px 0 12px 5px; 
+            display: flex; align-items: center; gap: 10px; font-weight: bold; text-transform: uppercase;
+        }
         .group-title::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+        /* 連結卡片樣式 */
+        .nav-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .nav-item { 
+            background: var(--card); border: 1px solid var(--border); 
+            padding: 14px 18px; border-radius: 16px;
+            display: flex; align-items: center; transition: 0.2s; cursor: pointer;
+            text-decoration: none; color: inherit;
+        }
+        .nav-item:hover { border-color: var(--blue); background: #212833; }
+
+        .icon-box { 
+            width: 42px; height: 42px; background: rgba(255,255,255,0.03); 
+            border-radius: 10px; display: flex; align-items: center; justify-content: center; 
+            font-size: 20px; margin-right: 15px; flex-shrink: 0;
+            border: 1px solid var(--border);
+        }
+        .title-text { font-size: 16px; font-weight: 600; flex-grow: 1; }
+        .arrow { color: var(--border); font-size: 12px; }
+
+        /* 管理模式元件 */
+        .admin-box { background: #161b22; border: 1px solid var(--gold); padding: 18px; border-radius: 20px; margin-bottom: 25px; }
+        input, select { 
+            width: 100%; padding: 12px; margin: 5px 0; border-radius: 10px; 
+            border: 1px solid #333; background: #000; color: #fff; box-sizing: border-box; 
+        }
+        .btn { padding: 10px 20px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-gold { background: var(--gold); color: #000; width: 100%; margin-top: 5px; font-size: 16px; }
+        .btn-edit { background: none; border: 1px solid var(--border); color: var(--gray); font-size: 12px; }
+        
+        .edit-card { border: 1px dashed var(--gold) !important; flex-direction: column; align-items: stretch !important; gap: 10px; }
+        .dev-badge { background: #238636; color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 8px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2 id="user-name">ELITE HUB</h2>
-        <button id="toggle-btn" style="background:none; border:1px solid #333; color:#888; padding:5px 10px; border-radius:8px;" onclick="checkAuth()">⚙️</button>
+        <h2 id="hub-title">ELITE HUB</h2>
+        <button id="toggle-btn" class="btn btn-edit" onclick="checkAuth()">⚙️ 管理模式</button>
     </div>
 
-    <div id="broadcast-area" class="broadcast-box" style="display: none;">
-        <h3>戰報廣播系統</h3>
-        <p style="font-size: 12px; color: var(--gray); margin-bottom: 15px;">點擊下方按鈕，將最新金庫數據發送到 LINE 群組</p>
+    <div id="broadcast-area" class="broadcast-box">
+        <h3 style="color: var(--gold); margin: 0 0 8px 0; font-size: 16px;">精英戰報子系統</h3>
         <button class="btn btn-gold" onclick="sendEliteFlex()">📢 發送黑金戰報卡片</button>
     </div>
 
-    <div id="nav-list">系統載入中...</div>
+    <div id="anchor-list" class="anchor-nav"></div>
+
+    <div id="add-form" class="admin-box" style="display: none;">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+            <input type="text" id="in-category" placeholder="分類">
+            <select id="in-icon">
+                <option value="📊">📊 數據</option><option value="💎">💎 錢包</option>
+                <option value="🚀">🚀 啟動</option><option value="⚙️">⚙️ 後台</option>
+            </select>
+        </div>
+        <input type="text" id="in-title" placeholder="連結名稱">
+        <input type="text" id="in-url" placeholder="網址 https://...">
+        <button class="btn btn-gold" onclick="addNew()">＋ 發佈到資料庫</button>
+    </div>
+
+    <div id="nav-list">載入中...</div>
 
 <script>
     const API_URL = 'https://nzuxyiefpenwuqudajdw.supabase.co/rest/v1';
     const KEY = 'sb_publishable_7y2n8zIopxlKEhcsJ05D2A_U89IFgae';
-    const HEADERS = { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json' };
+    const HEADERS = { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
+    const ADMIN_PASSWORD = "8888"; 
     const LIFF_ID = "2008868088-9hbWzzlW";
 
+    let adminMode = false;
+    let currentData = [];
     let currentPlayers = [];
 
-    // 1. 初始化 LIFF
+    // 1. 初始化 LIFF 與數據
     async function init() {
         try {
             await liff.init({ liffId: LIFF_ID });
-            if (liff.isInClient()) {
-                if (!liff.isLoggedIn()) { liff.login(); }
+            if (liff.isInClient() && liff.isLoggedIn()) {
                 const profile = await liff.getProfile();
-                document.getElementById('user-name').innerText = "ELITE · " + profile.displayName;
-                document.getElementById('broadcast-area').style.display = 'block'; // 只有在 LINE 內才顯示發送按鈕
+                document.getElementById('hub-title').innerText = "ELITE · " + profile.displayName;
             }
-        } catch (e) { console.log("Init error"); }
+        } catch (e) { console.log("LIFF Init Failed"); }
         fetchData();
     }
 
-    // 2. 獲取數據 (為了發送卡片時有最新資料)
     async function fetchData() {
         try {
             const [navRes, playerRes] = await Promise.all([
-                fetch(`${API_URL}/nav_links?select=*&order=category.asc`, { headers: HEADERS }),
+                fetch(`${API_URL}/nav_links?select=*&order=category.asc,id.asc`, { headers: HEADERS }),
                 fetch(`${API_URL}/players?select=*`, { headers: HEADERS })
             ]);
-            const links = await navRes.json();
+            currentData = await navRes.json();
             currentPlayers = await playerRes.json();
-            render(links);
+            render();
         } catch (e) { document.getElementById('nav-list').innerText = "連線失敗"; }
     }
 
-    // 3. 發送黑金卡片核心功能
+    // 2. 戰報卡片發送邏輯
     async function sendEliteFlex() {
-        // 整理前三名或結餘數據
-        const topSummary = currentPlayers
+        if (!liff.isInClient()) return alert("請在 LINE App 內使用");
+        
+        const summary = currentPlayers
             .filter(p => !p.name.startsWith('OFF_'))
             .sort((a, b) => (b.money + b.debt) - (a.money + a.debt))
-            .slice(0, 5) // 取前五名
+            .slice(0, 5)
             .map(p => `${p.name}: $${Math.round(p.money + p.debt)}`)
             .join('\n');
 
         try {
-            const result = await liff.shareTargetPicker([
-                {
-                    "type": "flex",
-                    "altText": "🏆 ELITE 菁英戰報",
-                    "contents": {
-                        "type": "bubble",
-                        "styles": { "header": { "backgroundColor": "#000000" }, "body": { "backgroundColor": "#1a1a1a" }, "footer": { "backgroundColor": "#1a1a1a" } },
-                        "header": { "type": "box", "layout": "vertical", "contents": [{ "type": "text", "text": "ELITE SYSTEM", "color": "#ffa502", "weight": "bold", "size": "sm" }] },
-                        "body": {
-                            "type": "box", "layout": "vertical", "contents": [
-                                { "type": "text", "text": "最新結餘戰報", "color": "#ffffff", "size": "xl", "weight": "bold" },
-                                { "type": "text", "text": topSummary, "color": "#eeeeee", "margin": "lg", "wrap": true, "fontStyle": "italic", "size": "sm" },
-                                { "type": "separator", "margin": "xl", "color": "#333333" },
-                                { "type": "text", "text": "點擊下方按鈕查看所有成員明細", "color": "#888888", "size": "xxs", "margin": "md" }
-                            ]
-                        },
-                        "footer": {
-                            "type": "box", "layout": "vertical", "contents": [{
-                                "type": "button", "style": "primary", "color": "#ffa502",
-                                "action": { "type": "uri", "label": "進入 ELITE HUB", "uri": "https://liff.line.me/" + LIFF_ID }
-                            }]
-                        }
-                    }
+            await liff.shareTargetPicker([{
+                "type": "flex",
+                "altText": "🏆 ELITE 戰報更新",
+                "contents": {
+                    "type": "bubble",
+                    "styles": { "header": { "backgroundColor": "#000000" }, "body": { "backgroundColor": "#1a1a1a" }, "footer": { "backgroundColor": "#1a1a1a" } },
+                    "header": { "type": "box", "layout": "vertical", "contents": [{ "type": "text", "text": "ELITE SYSTEM", "color": "#ffa502", "weight": "bold", "size": "sm" }] },
+                    "body": { "type": "box", "layout": "vertical", "contents": [
+                        { "type": "text", "text": "最新數據結算", "color": "#ffffff", "size": "xl", "weight": "bold" },
+                        { "type": "text", "text": summary || "尚無數據", "color": "#cccccc", "margin": "lg", "wrap": true, "size": "sm" },
+                        { "type": "separator", "margin": "xl", "color": "#333333" }
+                    ]},
+                    "footer": { "type": "box", "layout": "vertical", "contents": [{
+                        "type": "button", "style": "primary", "color": "#ffa502",
+                        "action": { "type": "uri", "label": "進入 HUB 查看明細", "uri": "https://liff.line.me/" + LIFF_ID }
+                    }]}
                 }
-            ]);
-            if (result) alert("戰報已送出！");
-        } catch (e) { alert("發送失敗，請確認 LINE 開發者後台已開啟 ShareTargetPicker 權限。"); }
+            }]);
+        } catch (e) { alert("發送失敗，請確認後台權限"); }
     }
 
-    // 4. 渲染連結列表
-    function render(data) {
+    // 3. 核心渲染邏輯 (恢復分組、錨點與管理模式)
+    function render() {
+        let groups = {};
+        currentData.forEach(item => {
+            const cat = item.category || "未分類";
+            if (!groups[cat]) groups[cat] = [];
+            groups[cat].push(item);
+        });
+
+        let anchorHtml = "";
+        Object.keys(groups).forEach(cat => {
+            if ((cat.includes("開發") || cat.includes("Dev")) && !adminMode) return;
+            anchorHtml += `<div class="anchor-btn" onclick="scrollToId('sec-${cat}')">${cat}</div>`;
+        });
+        document.getElementById('anchor-list').innerHTML = anchorHtml;
+
         let html = "";
-        let lastCat = "";
-        data.forEach(item => {
-            if (item.category !== lastCat) {
-                html += `<div class="group-title">${item.category}</div>`;
-                lastCat = item.category;
-            }
-            html += `
-                <a href="${item.url}" class="nav-item">
-                    <div class="icon-box">${item.icon || '🔗'}</div>
-                    <div class="title-text">${item.title}</div>
-                    <div class="arrow">➜</div>
-                </a>`;
+        Object.keys(groups).forEach(cat => {
+            const isDev = cat.includes("開發") || cat.includes("Dev");
+            if (isDev && !adminMode) return;
+
+            html += `<div class="group-title" id="sec-${cat}">${cat} ${isDev?'<span class="dev-badge">DEV</span>':''}</div>`;
+            html += `<div class="nav-grid">`;
+            
+            groups[cat].forEach(item => {
+                if (adminMode) {
+                    html += `
+                        <div class="nav-item edit-card">
+                            <div style="display:flex; gap:5px;">
+                                <input style="width:50px" value="${item.icon}" onchange="updateItem(${item.id}, 'icon', this.value)">
+                                <input style="flex:1" value="${item.title}" onchange="updateItem(${item.id}, 'title', this.value)">
+                                <button style="color:var(--red); border:none; background:none; font-size:20px;" onclick="deleteItem(${item.id})">×</button>
+                            </div>
+                            <input style="font-size:12px; color:var(--gray);" value="${item.url}" onchange="updateItem(${item.id}, 'url', this.value)">
+                            <input style="font-size:12px; color:var(--gold);" value="${item.category}" onchange="updateItem(${item.id}, 'category', this.value)" placeholder="分類">
+                        </div>`;
+                } else {
+                    html += `
+                        <a href="${item.url}" target="_blank" class="nav-item">
+                            <div class="icon-box">${item.icon || '🔗'}</div>
+                            <div class="title-text">${item.title}</div>
+                            <div class="arrow">➜</div>
+                        </a>`;
+                }
+            });
+            html += `</div>`;
         });
         document.getElementById('nav-list').innerHTML = html;
+    }
+
+    // 4. 管理功能與 API
+    function checkAuth() {
+        if (!adminMode) {
+            let pwd = prompt("密碼：");
+            if (pwd !== ADMIN_PASSWORD) return;
+        }
+        adminMode = !adminMode;
+        document.getElementById('toggle-btn').innerText = adminMode ? "✅ 退出管理" : "⚙️ 管理模式";
+        document.getElementById('add-form').style.display = adminMode ? "block" : "none";
+        render();
+    }
+
+    function scrollToId(id) { document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+
+    async function addNew() {
+        const t = document.getElementById('in-title').value, u = document.getElementById('in-url').value, i = document.getElementById('in-icon').value, c = document.getElementById('in-category').value || "常用";
+        await fetch(`${API_URL}/nav_links`, { method: 'POST', headers: HEADERS, body: JSON.stringify({ title: t, url: u, icon: i, category: c }) });
+        fetchData();
+    }
+
+    async function updateItem(id, field, value) {
+        let body = {}; body[field] = value;
+        await fetch(`${API_URL}/nav_links?id=eq.${id}`, { method: 'PATCH', headers: HEADERS, body: JSON.stringify(body) });
+        const index = currentData.findIndex(d => d.id === id);
+        currentData[index][field] = value;
+    }
+
+    async function deleteItem(id) {
+        if(!confirm("確定刪除？")) return;
+        await fetch(`${API_URL}/nav_links?id=eq.${id}`, { method: 'DELETE', headers: HEADERS });
+        fetchData();
     }
 
     window.onload = init;
