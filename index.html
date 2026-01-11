@@ -2,76 +2,93 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ELITE HUB</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELITE HUB - PRO</title>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
         :root { 
             --blue: #00d2ff; --gold: #ffa502; --bg: #0d1117; 
             --card: #1c222b; --border: #30363d; --gray: #8b949e; 
-            --red: #ff4757;
+            --red: #ff4757; --code-font: 'JetBrains Mono', 'Fira Code', monospace;
         }
-        body { background: var(--bg); color: #e6edf3; font-family: -apple-system, sans-serif; padding: 15px; max-width: 600px; margin: 0 auto; }
-        
+        body { 
+            background: var(--bg); color: #e6edf3; 
+            font-family: -apple-system, system-ui, sans-serif; 
+            padding: 15px; max-width: 600px; margin: 0 auto; line-height: 1.5;
+        }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .header h2 { letter-spacing: 2px; color: var(--blue); margin: 0; }
-
-        /* 戰報區 */
-        .broadcast-box { background: #161b22; border: 1px solid var(--gold); padding: 15px; border-radius: 18px; margin-bottom: 20px; }
-        select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #333; background: #000; color: var(--gold); margin-bottom: 10px; }
-
-        .anchor-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px; scrollbar-width: none; }
-        .anchor-nav::-webkit-scrollbar { display: none; }
-        .anchor-btn { background: var(--card); border: 1px solid var(--border); color: var(--gray); padding: 6px 14px; border-radius: 20px; font-size: 12px; white-space: nowrap; cursor: pointer; }
-
-        .group-title { font-size: 13px; color: var(--gray); margin: 25px 0 10px 5px; display: flex; align-items: center; gap: 10px; font-weight: bold; }
-        .group-title::after { content: ""; flex: 1; height: 1px; background: var(--border); }
-
-        .nav-grid { display: grid; gap: 10px; }
-        .nav-item { 
-            background: var(--card); border: 1px solid var(--border); padding: 12px 15px; 
-            border-radius: 15px; display: flex; align-items: center; cursor: pointer; text-decoration: none; color: inherit;
+        .header h2 { letter-spacing: 2px; font-weight: 900; color: var(--blue); margin: 0; font-size: 24px; }
+        .anchor-nav { 
+            display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; 
+            margin-bottom: 10px; sticky; top: 0; background: var(--bg); z-index: 10;
+            scrollbar-width: none;
         }
-
-        .icon-box { width: 40px; height: 40px; background: rgba(255,255,255,0.03); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-right: 12px; border: 1px solid var(--border); }
-        .title-text { font-size: 15px; font-weight: 600; flex-grow: 1; }
-
-        /* 管理模式：完整版 */
-        .admin-box { background: #161b22; border: 1px solid var(--gold); padding: 15px; border-radius: 18px; margin-bottom: 20px; }
-        .admin-box input { width: 100%; padding: 10px; margin: 4px 0; border-radius: 8px; border: 1px solid #333; background: #000; color: #fff; box-sizing: border-box; font-size: 14px; }
-        
-        .edit-card { border: 1px dashed var(--gold) !important; flex-direction: column; align-items: stretch !important; gap: 8px; padding: 15px; }
-        .btn { padding: 10px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; }
-        .btn-gold { background: var(--gold); color: #000; width: 100%; margin-top: 5px; }
-        .btn-red { background: var(--red); color: #fff; font-size: 12px; margin-top: 5px; }
+        .anchor-nav::-webkit-scrollbar { display: none; }
+        .anchor-btn { 
+            background: var(--card); border: 1px solid var(--border); color: var(--gray);
+            padding: 6px 14px; border-radius: 20px; font-size: 12px; white-space: nowrap; cursor: pointer;
+            transition: 0.2s;
+        }
+        .anchor-btn:active { background: var(--blue); color: #000; }
+        .group-title { 
+            font-size: 13px; color: var(--gray); margin: 30px 0 12px 5px; 
+            display: flex; align-items: center; gap: 10px; font-weight: bold; text-transform: uppercase;
+        }
+        .group-title::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+        .nav-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .nav-item { 
+            background: var(--card); border: 1px solid var(--border); 
+            padding: 14px 18px; border-radius: 16px;
+            display: flex; align-items: center; transition: 0.2s; cursor: pointer;
+            text-decoration: none; color: inherit;
+        }
+        .nav-item:hover { border-color: var(--blue); background: #212833; }
+        .nav-item:active { transform: scale(0.98); }
+        .icon-box { 
+            width: 42px; height: 42px; background: rgba(255,255,255,0.03); 
+            border-radius: 10px; display: flex; align-items: center; justify-content: center; 
+            font-size: 20px; margin-right: 15px; flex-shrink: 0;
+            border: 1px solid var(--border);
+        }
+        .title-text { font-size: 16px; font-weight: 600; flex-grow: 1; }
+        .arrow { color: var(--border); font-size: 12px; }
+        .admin-box { background: #161b22; border: 1px solid var(--gold); padding: 18px; border-radius: 20px; margin-bottom: 25px; }
+        input, select { 
+            width: 100%; padding: 12px; margin: 5px 0; border-radius: 10px; 
+            border: 1px solid #333; background: #000; color: #fff; box-sizing: border-box; 
+        }
+        .btn { padding: 10px 20px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-gold { background: var(--gold); color: #000; width: 100%; margin-top: 10px; font-size: 16px; }
+        .btn-edit { background: none; border: 1px solid var(--border); color: var(--gray); font-size: 12px; }
+        .btn-active { border-color: var(--gold); color: var(--gold); background: rgba(255,165,2,0.1); }
+        .edit-card { border: 1px dashed var(--gold) !important; flex-direction: column; align-items: stretch !important; gap: 10px; }
+        .dev-badge { background: #238636; color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 8px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2 id="hub-name">ELITE HUB</h2>
-        <button class="btn" style="background:none; color:var(--gray); font-size: 20px;" onclick="checkAuth()">⚙️</button>
-    </div>
-
-    <div class="broadcast-box">
-        <select id="report-type">
-            <option value="rank">🏆 總積分排名</option>
-            <option value="money">💰 金庫餘額排行</option>
-            <option value="debt">💸 欠款債務清單</option>
-        </select>
-        <button class="btn btn-gold" onclick="sendEliteFlex()">📢 發送選定戰報</button>
+        <h2>ELITE HUB</h2>
+        <button id="toggle-btn" class="btn btn-edit" onclick="checkAuth()">⚙️ 管理模式</button>
     </div>
 
     <div id="anchor-list" class="anchor-nav"></div>
 
     <div id="add-form" class="admin-box" style="display: none;">
-        <div style="display: grid; grid-template-columns: 1fr 3fr; gap: 5px;">
-            <input type="text" id="in-icon" placeholder="圖示" value="🔗">
-            <input type="text" id="in-category" placeholder="分類 (如: 數據/系統)">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+            <input type="text" id="in-category" placeholder="分類">
+            <select id="in-icon">
+                <option value="🔰">🔰 教學</option>
+                <option value="📊">📊 數據</option>
+                <option value="💻">💻 程式</option>
+                <option value="💎">💎 錢包</option>
+                <option value="🚀">🚀 啟動</option>
+                <option value="⚙️">⚙️ 後台</option>
+            </select>
         </div>
         <input type="text" id="in-title" placeholder="連結名稱">
         <input type="text" id="in-url" placeholder="網址 https://...">
-        <button class="btn btn-gold" onclick="addNew()">＋ 發佈連結</button>
+        <button class="btn btn-gold" onclick="addNew()">＋ 發佈到資料庫</button>
     </div>
 
     <div id="nav-list">載入中...</div>
@@ -80,26 +97,37 @@
     const API_URL = 'https://nzuxyiefpenwuqudajdw.supabase.co/rest/v1';
     const KEY = 'sb_publishable_7y2n8zIopxlKEhcsJ05D2A_U89IFgae';
     const HEADERS = { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
-    const LIFF_ID = "2008868088-9hbWzzlW";
+    const ADMIN_PASSWORD = "8888"; 
+    const LIFF_ID = "2008868088-9hbWzzlW"; // 你的 LIFF ID
 
     let adminMode = false;
     let currentData = [];
-    let currentPlayers = [];
 
-    async function init() {
+    // 初始化：僅啟動不強制登入
+    liff.init({ liffId: LIFF_ID }).catch(e => console.log("LIFF Init Silent"));
+
+    async function fetchData() {
         try {
-            await liff.init({ liffId: LIFF_ID });
-            // 取消強制跳轉登入，僅在必要時執行
-            if (liff.isLoggedIn()) {
-                const profile = await liff.getProfile();
-                document.getElementById('hub-name').innerText = "ELITE · " + profile.displayName;
-            }
-        } catch (e) { console.log("Init Error"); }
-        fetchData();
+            const res = await fetch(`${API_URL}/nav_links?select=*&order=category.asc,id.asc`, { headers: HEADERS });
+            currentData = await res.json();
+            render();
+        } catch (e) { document.getElementById('nav-list').innerText = "連線失敗"; }
     }
 
-    // 🏆 關鍵：讓子網頁繼承權限的跳轉
-    function openSubsystem(url) {
+    function checkAuth() {
+        if (!adminMode) {
+            let pwd = prompt("請輸入管理密碼：");
+            if (pwd !== ADMIN_PASSWORD) return alert("密碼錯誤");
+        }
+        adminMode = !adminMode;
+        document.getElementById('toggle-btn').innerText = adminMode ? "✅ 退出管理" : "⚙️ 管理模式";
+        document.getElementById('toggle-btn').classList.toggle('btn-active', adminMode);
+        document.getElementById('add-form').style.display = adminMode ? "block" : "none";
+        render();
+    }
+
+    // 修復點：確保在 LINE 內部視窗跳轉以繼承權限
+    function openUrl(url) {
         if (liff.isInClient()) {
             liff.openWindow({ url: url, external: false });
         } else {
@@ -107,109 +135,77 @@
         }
     }
 
-    async function fetchData() {
-        const [navRes, playerRes] = await Promise.all([
-            fetch(`${API_URL}/nav_links?select=*&order=category.asc,id.asc`, { headers: HEADERS }),
-            fetch(`${API_URL}/players?select=*`, { headers: HEADERS })
-        ]);
-        currentData = await navRes.json();
-        currentPlayers = await playerRes.json();
-        render();
-    }
-
     function render() {
         let groups = {};
         currentData.forEach(item => {
-            if (!groups[item.category]) groups[item.category] = [];
-            groups[item.category].push(item);
+            const cat = item.category || "未分類";
+            if (!groups[cat]) groups[cat] = [];
+            groups[cat].push(item);
         });
 
-        // 渲染錨點
-        document.getElementById('anchor-list').innerHTML = Object.keys(groups)
-            .map(cat => `<div class="anchor-btn" onclick="document.getElementById('sec-${cat}').scrollIntoView({behavior:'smooth'})">${cat}</div>`).join('');
+        let anchorHtml = "";
+        Object.keys(groups).forEach(cat => {
+            if ((cat.includes("開發") || cat.includes("Dev")) && !adminMode) return;
+            anchorHtml += `<div class="anchor-btn" onclick="scrollToId('sec-${cat}')">${cat}</div>`;
+        });
+        document.getElementById('anchor-list').innerHTML = anchorHtml;
 
         let html = "";
         Object.keys(groups).forEach(cat => {
-            html += `<div class="group-title" id="sec-${cat}">${cat}</div><div class="nav-grid">`;
+            const isDev = cat.includes("開發") || cat.includes("Dev");
+            if (isDev && !adminMode) return;
+
+            html += `<div class="group-title" id="sec-${cat}">${cat} ${isDev?'<span class="dev-badge">DEV ONLY</span>':''}</div>`;
+            html += `<div class="nav-grid">`;
+            
             groups[cat].forEach(item => {
                 if (adminMode) {
-                    html += `<div class="nav-item edit-card">
-                        <div style="display:flex; gap:5px;">
-                            <input style="width:40px" value="${item.icon}" onchange="updateItem(${item.id}, 'icon', this.value)">
-                            <input style="flex:1" value="${item.title}" onchange="updateItem(${item.id}, 'title', this.value)">
-                        </div>
-                        <input value="${item.url}" onchange="updateItem(${item.id}, 'url', this.value)">
-                        <input value="${item.category}" onchange="updateItem(${item.id}, 'category', this.value)">
-                        <button class="btn btn-red" onclick="deleteItem(${item.id})">🗑️ 刪除此連結</button>
-                    </div>`;
-                } else {
                     html += `
-                        <div onclick="openSubsystem('${item.url}')" class="nav-item">
+                        <div class="nav-item edit-card">
+                            <div style="display:flex; gap:5px;">
+                                <input style="width:50px" value="${item.icon}" onchange="updateItem(${item.id}, 'icon', this.value)">
+                                <input style="flex:1" value="${item.title}" onchange="updateItem(${item.id}, 'title', this.value)">
+                                <button style="color:var(--red); border:none; background:none; font-size:20px;" onclick="deleteItem(${item.id})">×</button>
+                            </div>
+                            <input style="font-size:12px; color:var(--gray);" value="${item.url}" onchange="updateItem(${item.id}, 'url', this.value)">
+                            <input style="font-size:12px; color:var(--gold);" value="${item.category}" onchange="updateItem(${item.id}, 'category', this.value)">
+                        </div>`;
+                } else {
+                    // 關鍵修正：改用 openUrl 函數，不再使用 <a> 標籤
+                    html += `
+                        <div onclick="openUrl('${item.url}')" class="nav-item">
                             <div class="icon-box">${item.icon || '🔗'}</div>
                             <div class="title-text">${item.title}</div>
-                            <div style="color:var(--border)">➜</div>
+                            <div class="arrow">➜</div>
                         </div>`;
                 }
             });
             html += `</div>`;
         });
-        document.getElementById('nav-list').innerHTML = html;
+        document.getElementById('nav-list').innerHTML = html || '暫無資料';
     }
 
-    // 戰報功能
-    async function sendEliteFlex() {
-        if (!liff.isLoggedIn()) { liff.login(); return; }
-        const type = document.getElementById('report-type').value;
-        const players = currentPlayers.filter(p => !p.name.startsWith('OFF_'));
-        let title = "戰報", content = "";
-
-        if (type === 'rank') {
-            title = "🏆 總積分排名";
-            content = players.sort((a,b)=>(b.money+b.debt)-(a.money+a.debt)).slice(0,8).map(p=>`${p.name}: ${Math.round(p.money+p.debt)}`).join('\n');
-        } else if (type === 'money') {
-            title = "💰 金庫餘額排行";
-            content = players.sort((a,b)=>b.money-a.money).slice(0,8).map(p=>`${p.name}: $${p.money}`).join('\n');
-        } else {
-            title = "💸 欠款債務清單";
-            content = players.filter(p=>p.debt!==0).map(p=>`${p.name}: ${p.debt}`).join('\n');
-        }
-
-        await liff.shareTargetPicker([{
-            "type": "flex", "altText": title,
-            "contents": {
-                "type": "bubble", "styles": { "header": {"backgroundColor":"#000000"}, "body": {"backgroundColor":"#1a1a1a"} },
-                "header": { "type": "box", "layout": "vertical", "contents": [{"type":"text","text":title,"color":"#ffa502","weight":"bold"}] },
-                "body": { "type": "box", "layout": "vertical", "contents": [{"type":"text","text":content||"無數據","color":"#ffffff","wrap":true,"size":"sm"}] }
-            }
-        }]);
-    }
-
-    function checkAuth() {
-        if (!adminMode && prompt("管理密碼") !== "8888") return;
-        adminMode = !adminMode;
-        document.getElementById('add-form').style.display = adminMode ? "block" : "none";
-        render();
-    }
+    function scrollToId(id) { document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 
     async function addNew() {
-        const t = document.getElementById('in-title').value, u = document.getElementById('in-url').value, i = document.getElementById('in-icon').value, c = document.getElementById('in-category').value;
+        const t = document.getElementById('in-title').value, u = document.getElementById('in-url').value, i = document.getElementById('in-icon').value, c = document.getElementById('in-category').value || "常用";
+        if(!t || !u) return alert("必填");
         await fetch(`${API_URL}/nav_links`, { method: 'POST', headers: HEADERS, body: JSON.stringify({ title: t, url: u, icon: i, category: c }) });
         fetchData();
     }
 
     async function updateItem(id, field, value) {
-        let b = {}; b[field] = value;
-        await fetch(`${API_URL}/nav_links?id=eq.${id}`, { method: 'PATCH', headers: HEADERS, body: JSON.stringify(b) });
+        let body = {}; body[field] = value;
+        await fetch(`${API_URL}/nav_links?id=eq.${id}`, { method: 'PATCH', headers: HEADERS, body: JSON.stringify(body) });
     }
 
     async function deleteItem(id) {
-        if(confirm("確定刪除？")) {
-            await fetch(`${API_URL}/nav_links?id=eq.${id}`, { method: 'DELETE', headers: HEADERS });
-            fetchData();
-        }
+        if(!confirm("確定刪除？")) return;
+        await fetch(`${API_URL}/nav_links?id=eq.${id}`, { method: 'DELETE', headers: HEADERS });
+        fetchData();
     }
 
-    window.onload = init;
+    fetchData();
 </script>
 </body>
 </html>
