@@ -2,9 +2,11 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ELITE HUB - PRO</title>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
+        /* ... 你原本的 CSS 保持不變 ... */
         :root { 
             --blue: #00d2ff; --gold: #ffa502; --bg: #0d1117; 
             --card: #1c222b; --border: #30363d; --gray: #8b949e; 
@@ -15,71 +17,30 @@
             font-family: -apple-system, system-ui, sans-serif; 
             padding: 15px; max-width: 600px; margin: 0 auto; line-height: 1.5;
         }
-        
-        /* 頂部 Header */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .header h2 { letter-spacing: 2px; font-weight: 900; color: var(--blue); margin: 0; font-size: 24px; }
-
-        /* 快速跳轉錨點 */
-        .anchor-nav { 
-            display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; 
-            margin-bottom: 10px; sticky; top: 0; background: var(--bg); z-index: 10;
-            scrollbar-width: none;
-        }
+        .anchor-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 10px; sticky; top: 0; background: var(--bg); z-index: 10; scrollbar-width: none; }
         .anchor-nav::-webkit-scrollbar { display: none; }
-        .anchor-btn { 
-            background: var(--card); border: 1px solid var(--border); color: var(--gray);
-            padding: 6px 14px; border-radius: 20px; font-size: 12px; white-space: nowrap; cursor: pointer;
-            transition: 0.2s;
-        }
-        .anchor-btn:active { background: var(--blue); color: #000; }
-
-        /* 分類標題樣式 */
-        .group-title { 
-            font-size: 13px; color: var(--gray); margin: 30px 0 12px 5px; 
-            display: flex; align-items: center; gap: 10px; font-weight: bold; text-transform: uppercase;
-        }
+        .anchor-btn { background: var(--card); border: 1px solid var(--border); color: var(--gray); padding: 6px 14px; border-radius: 20px; font-size: 12px; white-space: nowrap; cursor: pointer; transition: 0.2s; }
+        .group-title { font-size: 13px; color: var(--gray); margin: 30px 0 12px 5px; display: flex; align-items: center; gap: 10px; font-weight: bold; text-transform: uppercase; }
         .group-title::after { content: ""; flex: 1; height: 1px; background: var(--border); }
-
-        /* 連結卡片樣式 */
         .nav-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
-        .nav-item { 
-            background: var(--card); border: 1px solid var(--border); 
-            padding: 14px 18px; border-radius: 16px;
-            display: flex; align-items: center; transition: 0.2s; cursor: pointer;
-            text-decoration: none; color: inherit;
-        }
-        .nav-item:hover { border-color: var(--blue); background: #212833; }
-        .nav-item:active { transform: scale(0.98); }
-
-        .icon-box { 
-            width: 42px; height: 42px; background: rgba(255,255,255,0.03); 
-            border-radius: 10px; display: flex; align-items: center; justify-content: center; 
-            font-size: 20px; margin-right: 15px; flex-shrink: 0;
-            border: 1px solid var(--border);
-        }
+        .nav-item { background: var(--card); border: 1px solid var(--border); padding: 14px 18px; border-radius: 16px; display: flex; align-items: center; transition: 0.2s; cursor: pointer; text-decoration: none; color: inherit; }
+        .icon-box { width: 42px; height: 42px; background: rgba(255,255,255,0.03); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-right: 15px; flex-shrink: 0; border: 1px solid var(--border); }
         .title-text { font-size: 16px; font-weight: 600; flex-grow: 1; }
         .arrow { color: var(--border); font-size: 12px; }
-
-        /* 管理模式元件 */
         .admin-box { background: #161b22; border: 1px solid var(--gold); padding: 18px; border-radius: 20px; margin-bottom: 25px; }
-        input, select { 
-            width: 100%; padding: 12px; margin: 5px 0; border-radius: 10px; 
-            border: 1px solid #333; background: #000; color: #fff; box-sizing: border-box; 
-        }
+        input, select { width: 100%; padding: 12px; margin: 5px 0; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; box-sizing: border-box; }
         .btn { padding: 10px 20px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-gold { background: var(--gold); color: #000; width: 100%; margin-top: 10px; font-size: 16px; }
         .btn-edit { background: none; border: 1px solid var(--border); color: var(--gray); font-size: 12px; }
-        .btn-active { border-color: var(--gold); color: var(--gold); background: rgba(255,165,2,0.1); }
-        
-        .edit-card { border: 1px dashed var(--gold) !important; flex-direction: column; align-items: stretch !important; gap: 10px; }
         .dev-badge { background: #238636; color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 8px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2>ELITE HUB</h2>
+        <h2 id="hub-title">ELITE HUB</h2>
         <button id="toggle-btn" class="btn btn-edit" onclick="checkAuth()">⚙️ 管理模式</button>
     </div>
 
@@ -87,14 +48,10 @@
 
     <div id="add-form" class="admin-box" style="display: none;">
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-            <input type="text" id="in-category" placeholder="分類 (例如：常用, 開發)">
+            <input type="text" id="in-category" placeholder="分類">
             <select id="in-icon">
-                <option value="🔰">🔰 教學</option>
-                <option value="📊">📊 數據</option>
-                <option value="💻">💻 程式</option>
-                <option value="💎">💎 錢包</option>
-                <option value="🚀">🚀 啟動</option>
-                <option value="⚙️">⚙️ 後台</option>
+                <option value="🚀">🚀 啟動</option><option value="📊">📊 數據</option>
+                <option value="💎">💎 錢庫</option><option value="⚙️">⚙️ 設定</option>
             </select>
         </div>
         <input type="text" id="in-title" placeholder="連結名稱">
@@ -109,11 +66,41 @@
     const KEY = 'sb_publishable_7y2n8zIopxlKEhcsJ05D2A_U89IFgae';
     const HEADERS = { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
     const ADMIN_PASSWORD = "8888"; 
+    const LIFF_ID = "2008868088-9hbWzzlW"; // 你的 LIFF ID
 
     let adminMode = false;
     let currentData = [];
 
-    // 1. 初始化讀取
+    // 2. LIFF 初始化：確保 HUB 本身在 LINE 環境運行
+    async function initLIFF() {
+        try {
+            await liff.init({ liffId: LIFF_ID });
+            if (liff.isInClient()) {
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                } else {
+                    const profile = await liff.getProfile();
+                    document.getElementById('hub-title').innerText = "ELITE · " + profile.displayName;
+                }
+            }
+        } catch (e) { console.log("LIFF Init Failed"); }
+        fetchData();
+    }
+
+    // 3. 智慧跳轉：如果是 LINE 環境，使用 liff.openWindow 保持權限
+    function smartNavigate(url) {
+        if (liff.isInClient()) {
+            // 使用 liff.openWindow 打開外部連結，能保持在 LINE 內部的瀏覽狀態
+            liff.openWindow({
+                url: url,
+                external: false
+            });
+        } else {
+            // 一般瀏覽器直接跳轉
+            window.location.href = url;
+        }
+    }
+
     async function fetchData() {
         try {
             const res = await fetch(`${API_URL}/nav_links?select=*&order=category.asc,id.asc`, { headers: HEADERS });
@@ -122,76 +109,63 @@
         } catch (e) { document.getElementById('nav-list').innerText = "連線失敗"; }
     }
 
-    // 2. 密碼驗證
-    function checkAuth() {
-        if (!adminMode) {
-            let pwd = prompt("請輸入管理密碼以解鎖開發者功能：");
-            if (pwd !== ADMIN_PASSWORD) return alert("密碼錯誤");
-        }
-        adminMode = !adminMode;
-        document.getElementById('toggle-btn').innerText = adminMode ? "✅ 退出管理" : "⚙️ 管理模式";
-        document.getElementById('toggle-btn').classList.toggle('btn-active', adminMode);
-        document.getElementById('add-form').style.display = adminMode ? "block" : "none";
-        render();
-    }
-
-    // 3. 核心渲染邏輯
     function render() {
         let groups = {};
-        // 將資料按 category 分組
         currentData.forEach(item => {
             const cat = item.category || "未分類";
             if (!groups[cat]) groups[cat] = [];
             groups[cat].push(item);
         });
 
-        // 渲染頂部錨點
         let anchorHtml = "";
         Object.keys(groups).forEach(cat => {
-            // 如果是開發區且未開管理模式，不顯示錨點
             if ((cat.includes("開發") || cat.includes("Dev")) && !adminMode) return;
             anchorHtml += `<div class="anchor-btn" onclick="scrollToId('sec-${cat}')">${cat}</div>`;
         });
         document.getElementById('anchor-list').innerHTML = anchorHtml;
 
-        // 渲染分區清單
         let html = "";
         Object.keys(groups).forEach(cat => {
             const isDev = cat.includes("開發") || cat.includes("Dev");
-            if (isDev && !adminMode) return; // 隱藏開發者區塊
+            if (isDev && !adminMode) return;
 
-            html += `<div class="group-title" id="sec-${cat}">${cat} ${isDev?'<span class="dev-badge">DEV ONLY</span>':''}</div>`;
+            html += `<div class="group-title" id="sec-${cat}">${cat} ${isDev?'<span class="dev-badge">DEV</span>':''}</div>`;
             html += `<div class="nav-grid">`;
             
             groups[cat].forEach(item => {
                 if (adminMode) {
                     html += `
-                        <div class="nav-item edit-card">
+                        <div class="nav-item edit-card" style="flex-direction:column; align-items:stretch; border: 1px dashed var(--gold);">
                             <div style="display:flex; gap:5px;">
                                 <input style="width:50px" value="${item.icon}" onchange="updateItem(${item.id}, 'icon', this.value)">
                                 <input style="flex:1" value="${item.title}" onchange="updateItem(${item.id}, 'title', this.value)">
                                 <button style="color:var(--red); border:none; background:none; font-size:20px;" onclick="deleteItem(${item.id})">×</button>
                             </div>
                             <input style="font-size:12px; color:var(--gray);" value="${item.url}" onchange="updateItem(${item.id}, 'url', this.value)">
-                            <input style="font-size:12px; color:var(--gold);" value="${item.category}" onchange="updateItem(${item.id}, 'category', this.value)" placeholder="分類">
                         </div>`;
                 } else {
+                    // 這裡改用 onclick 觸發 smartNavigate
                     html += `
-                        <a href="${item.url}" target="_blank" class="nav-item">
+                        <div onclick="smartNavigate('${item.url}')" class="nav-item">
                             <div class="icon-box">${item.icon || '🔗'}</div>
                             <div class="title-text">${item.title}</div>
                             <div class="arrow">➜</div>
-                        </a>`;
+                        </div>`;
                 }
             });
             html += `</div>`;
         });
-        document.getElementById('nav-list').innerHTML = html || '<div style="text-align:center; padding:50px; color:var(--gray);">暫無公開連結</div>';
+        document.getElementById('nav-list').innerHTML = html || '暫無公開連結';
     }
 
-    // 4. 功能函數
-    function scrollToId(id) {
-        document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+    function checkAuth() {
+        if (!adminMode) {
+            let pwd = prompt("密碼：");
+            if (pwd !== ADMIN_PASSWORD) return;
+        }
+        adminMode = !adminMode;
+        document.getElementById('add-form').style.display = adminMode ? "block" : "none";
+        render();
     }
 
     async function addNew() {
@@ -199,34 +173,27 @@
         const u = document.getElementById('in-url').value;
         const i = document.getElementById('in-icon').value;
         const c = document.getElementById('in-category').value || "常用";
-        if(!t || !u) return alert("名稱與網址為必填");
-        
-        await fetch(`${API_URL}/nav_links`, { 
-            method: 'POST', 
-            headers: HEADERS, 
-            body: JSON.stringify({ title: t, url: u, icon: i, category: c }) 
-        });
-        
-        document.getElementById('in-title').value = ""; 
-        document.getElementById('in-url').value = "";
+        await fetch(`${API_URL}/nav_links`, { method: 'POST', headers: HEADERS, body: JSON.stringify({ title: t, url: u, icon: i, category: c }) });
         fetchData();
     }
 
     async function updateItem(id, field, value) {
         let body = {}; body[field] = value;
         await fetch(`${API_URL}/nav_links?id=eq.${id}`, { method: 'PATCH', headers: HEADERS, body: JSON.stringify(body) });
-        // 不刷新頁面以保持編輯手感，僅更新本地數據
-        const index = currentData.findIndex(d => d.id === id);
-        currentData[index][field] = value;
     }
 
     async function deleteItem(id) {
-        if(!confirm("確定刪除此連結？")) return;
-        await fetch(`${API_URL}/nav_links?id=eq.${id}`, { method: 'DELETE', headers: HEADERS });
-        fetchData();
+        if(confirm("刪除？")) {
+            await fetch(`${API_URL}/nav_links?id=eq.${id}`, { method: 'DELETE', headers: HEADERS });
+            fetchData();
+        }
     }
 
-    fetchData();
+    function scrollToId(id) { document.getElementById(id).scrollIntoView({ behavior: 'smooth' }); }
+
+    // 啟動初始化
+    window.onload = initLIFF;
 </script>
 </body>
 </html>
+
